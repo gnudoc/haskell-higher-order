@@ -1,0 +1,7 @@
+cradle:
+  cabal:
+    cabalProject: "./haskell-higher-order.cabal"
+    components:
+      - path: "./lib"
+        component: "haskell-higher-order:lib:haskell-higher-order"
+  
