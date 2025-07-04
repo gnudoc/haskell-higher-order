@@ -98,3 +98,27 @@ numLongChains' = length (filter (\xs -> length xs > 15) (map chain [1..100]))
 zipped = zipWith (\a b -> (a * 30 + 3) / b) [5,4,3,2,1] [1,2,3,4,5]
 
 sumPairs = map (\(a,b) -> a+b) [(1,2),(3,4),(5,6),(7,8)]
+
+elem' :: (Eq a) => a -> [a] -> Bool
+elem' y ys = foldl (\acc x -> if x == y then True else acc) False ys
+
+
+--------------------------------
+------right and left folds------
+--------------------------------
+
+-- <fold> <function> acc xs (starting value and list) where function takes 2 params
+-- foldr f acc xs means f x1 (f x2 (f x3 (f x4 (f x5 acc))))
+-- foldl g acc xs means g (g (g (g (g acc x1) x2) x3) x4) x5
+
+map' :: (a -> b) -> [a] -> [b]
+map' f xs = foldr (\x acc -> f x : acc) [] xs
+map'' :: (a -> b) -> [a] -> [b]
+map'' f xs = foldl (\acc x -> acc ++ [f x]) [] xs
+-- ^ we're building a new list, so we generally want a right-fold in order to
+-- take advantage of prepending (quicker than concatenating)
+
+negNums = map' (negate . abs) [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
+
+negSumTail = map' (negate . sum . tail) [[1..5],[2..6],[3..7]]
+
