@@ -1,0 +1,189 @@
+#+TITLE: Haskell Higher-Order Functions Summary
+#+AUTHOR: Aijaz
+#+DATE: [2025-07-04 Fri]
+#+PROPERTY: header-args:haskell :session my-haskell
+
+Introduction
+
+This document summarizes the key concepts from the "Higher-Order Functions" chapter of "Learn You a Haskell for Great Good!". It focuses on the informational content and code examples, presenting them in a literate programming style using Org-mode.
+
+Curried Functions
+
+In Haskell, every function officially takes only one argument. Functions that appear to take multiple arguments are curried. This means that when you provide an argument, the function returns a new function that awaits the next argument. This allows for partial application.
+
+For example, max 4 5 is evaluated as (max 4) 5. The expression (max 4) creates a new function that takes an argument and returns the greater of that argument and 4.
+
+#+BEGIN_SRC haskell
+-- A function that "takes" three arguments
+multThree :: (Num a) => a -> a -> a -> a
+multThree x y z = x * y * z
+
+-- Partially applying multThree creates new functions
+-- multThree 9 returns a function that multiplies its two arguments by 9.
+let multTwoWithNine = multThree 9
+multTwoWithNine 2 3
+#+END_SRC
+
+
+This is particularly useful for creating specialized functions without writing them from scratch.
+
+#+BEGIN_SRC haskell
+-- compare 100 creates a function that compares its input to 100.
+let compareWithHundred = compare 100
+compareWithHundred 99
+#+END_SRC
+
+Sections are a way to partially apply infix functions.
+
+#+BEGIN_SRC haskell
+-- Creates a function that divides its input by 10
+let divideByTen = (/10)
+divideByTen 200
+
+-- Creates a function that checks for membership in the uppercase alphabet
+let isUpperAlphanum = (elem ['A'..'Z'])
+isUpperAlphanum 'C'
+#+END_SRC
+
+Higher-Order Functions
+
+A higher-order function is a function that either takes a function as an argument or returns a function as its result (or both). They are fundamental to Haskell and are used to abstract away common patterns of computation.
+
+1. Functions as Arguments
+
+Here is a function that takes another function f and applies it twice to a value x.
+
+#+BEGIN_SRC haskell
+applyTwice :: (a -> a) -> a -> a
+applyTwice f x = f (f x)
+
+applyTwice (+3) 10
+applyTwice (++ " HAHA") "HEY"
+#+END_SRC
+
+2. zipWith
+
+The zipWith function abstracts the pattern of combining two lists. It takes a function and two lists, and applies the function to corresponding elements.
+
+#+BEGIN_SRC haskell
+zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith' _ [] _ = []
+zipWith' _ _ [] = []
+zipWith' f (x:xs) (y:ys) = f x y : zipWith' f xs ys
+
+zipWith' (+) [1,2,3] [4,5,6]
+zipWith' (++) ["foo ", "bar "] ["fighters", "hoppers"]
+#+END_SRC
+
+
+3. flip
+
+The flip function takes a two-argument function and returns a new function where the arguments are swapped.
+
+#+BEGIN_SRC haskell
+flip' :: (a -> b -> c) -> b -> a -> c
+flip' f y x = f x y
+
+zip [1,2,3] "abc"
+flip' zip [1,2,3] "abc"
+#+END_SRC
+
+
+Map and Filter
+
+map and filter are two of the most common higher-order functions. map applies a function to every element in a list, while filter removes elements from a list based on a predicate (a function that returns a boolean).
+
+#+BEGIN_SRC haskell
+-- Map applies a function to every element
+map (+3) [1, 5, 3, 1, 6]
+
+-- Filter keeps only elements that satisfy a predicate
+filter (>3) [1, 5, 3, 1, 6]
+#+END_SRC
+
+
+Thanks to Haskell's laziness, you can compose multiple maps and filters without performance loss, as the list is only traversed once. This allows for clear and declarative solutions to problems.
+
+#+BEGIN_SRC haskell
+-- Find the largest number under 100,000 divisible by 3829
+largestDivisible :: (Integral a) => a
+largestDivisible = head (filter p [100000,99999..])
+where p x = x mod 3829 == 0
+
+largestDivisible
+#+END_SRC
+
+
+Lambdas (Anonymous Functions)
+
+Lambdas are functions without a name. They are useful when you need a function for a single, specific purpose, such as passing it to a higher-order function like map or fold.
+
+The syntax is \ followed by parameters, a ->, and the function body.
+
+#+BEGIN_SRC haskell
+-- A lambda that adds two to its argument
+map (\x -> x + 2) [1,2,3]
+
+-- This is equivalent to map (+2) [1,2,3]
+#+END_SRC
+
+
+Lambdas can take multiple parameters.
+
+#+BEGIN_SRC haskell
+zipWith (\a b -> (a * 30 + 3) / b) [5,4,3,2,1] [1,2,3,4,5]
+#+END_SRC
+
+
+Folds
+
+A fold is a higher-order function that collapses a list into a single value. It does this by repeatedly applying a combining function to the elements of the list and an accumulator.
+
+1. foldl (Left Fold)
+A left fold starts from the left of the list and applies the function. The evaluation looks like: f (f (f start_val x1) x2) x3.
+
+#+BEGIN_SRC haskell
+-- sum implemented with a left fold
+sum' :: (Num a) => [a] -> a
+sum' xs = foldl (\acc x -> acc + x) 0 xs
+
+sum' [1,2,3,4,5]
+#+END_SRC
+
+
+2. foldr (Right Fold)
+A right fold starts from the right of the list. The evaluation looks like: f x1 (f x2 (f x3 start_val)).
+
+#+BEGIN_SRC haskell
+-- map can be implemented with a right fold
+map' :: (a -> b) -> [a] -> [b]
+map' f xs = foldr (\x acc -> f x : acc) [] xs
+
+map' (*2) [1,2,3]
+#+END_SRC
+
+
+foldr is more common in Haskell as it can work on infinite lists, whereas foldl often cannot.
+
+foldl1 and foldr1 are variants that use the first (or last) element of the list as the starting accumulator, so they are not safe to use on empty lists.
+
+3. scanl and scanr
+scanl and scanr are similar to folds but they report all the intermediate accumulator states as a list.
+
+#+BEGIN_SRC haskell
+scanl (+) 0 [3,5,2,1]
+scanr (+) 0 [3,5,2,1]
+#+END_SRC
+
+
+Function Composition
+
+The . operator performs function composition. (f . g) x is the same as f (g x). This allows you to create new functions by chaining existing functions together.
+
+#+BEGIN_SRC haskell
+-- negate . (* 3) creates a function that first multiplies by 3, then negates the result.
+map (negate . abs) [5,-3,-6,7,-3,2,-19,24]
+#+END_SRC
+
+
+Writing functions by composing other functions is known as point-free style. For example, sum' = foldl (+) 0 is the point-free version of the sum' function defined earlier. This style can be very concise and readable, but can also become confusing if the composition chain is too long.
