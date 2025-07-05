@@ -118,6 +118,10 @@ map'' f xs = foldl (\acc x -> acc ++ [f x]) [] xs
 -- ^ we're building a new list, so we generally want a right-fold in order to
 -- take advantage of prepending (quicker than concatenating)
 
+--------------------------------
+------function composition------
+--------------------------------
+
 negNums = map' (negate . abs) [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
 
 negSumTail = map' (negate . sum . tail) [[1..5],[2..6],[3..7]]
