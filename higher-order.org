@@ -1,7 +1,7 @@
 #+TITLE: Haskell Higher-Order Functions Summary
 #+AUTHOR: Aijaz
 #+DATE: [2025-07-04 Fri]
-#+PROPERTY: header-args:haskell :session my-haskell
+#+PROPERTY: header-args:haskell :tangle ./lib/MyLib.hs :mkdirp yes :result no
 
 Introduction
 
@@ -20,8 +20,8 @@ multThree x y z = x * y * z
 
 -- Partially applying multThree creates new functions
 -- multThree 9 returns a function that multiplies its two arguments by 9.
-let multTwoWithNine = multThree 9
-multTwoWithNine 2 3
+-- let multTwoWithNine = multThree 9
+-- ghci> multTwoWithNine 2 3
 #+END_SRC
 
 
@@ -29,20 +29,20 @@ This is particularly useful for creating specialized functions without writing t
 
 #+BEGIN_SRC haskell
 -- compare 100 creates a function that compares its input to 100.
-let compareWithHundred = compare 100
-compareWithHundred 99
+-- let compareWithHundred = compare 100
+-- ghci> compareWithHundred 99
 #+END_SRC
 
 Sections are a way to partially apply infix functions.
 
 #+BEGIN_SRC haskell
 -- Creates a function that divides its input by 10
-let divideByTen = (/10)
-divideByTen 200
+-- let divideByTen = (/10)
+-- ghci> divideByTen 200
 
 -- Creates a function that checks for membership in the uppercase alphabet
-let isUpperAlphanum = (elem ['A'..'Z'])
-isUpperAlphanum 'C'
+-- let isUpperAlphanum = (elem ['A'..'Z'])
+-- ghci> isUpperAlphanum 'C'
 #+END_SRC
 
 Higher-Order Functions
