@@ -126,3 +126,19 @@ negNums = map' (negate . abs) [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
 
 negSumTail = map' (negate . sum . tail) [[1..5],[2..6],[3..7]]
 
+
+------------------------------------
+-- functors are things that can 
+-- be mapped over. such as lists 
+-- maybes, eithers, trees and other
+-- box-like or container-like
+-- structures.
+-- this lets us generalise the idea
+-- of working with functions applied
+-- to different examples of these
+-- box-like structures - so you can
+-- use the same function on the
+-- contents of a tree, a list and an
+-- either, and e.g. use that function in
+-- a pipeline of . composed functions
+------------------------------------
